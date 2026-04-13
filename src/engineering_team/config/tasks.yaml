@@ -1,0 +1,87 @@
+design_task:
+  description: >
+    Take the high level requirements described here and prepare a detailed design for the engineer;
+    everything should be in 1 python module, but outline the classes and methods in the module.
+    Here are the requirements: {requirements}
+    IMPORTANT: Only output the design in markdown format, laying out in detail the classes and functions in the module, describing the functionality.
+  expected_output: >
+    A detailed design for the engineer, identifying the classes and functions in the module.
+  agent: engineering_lead
+  output_file: output/{module_name}_design.md
+
+ux_ui_task:
+  description: >
+    Based on the requirements and the engineering lead's design for {module_name} / {class_name}, produce a UX/UI specification
+    for the Gradio demo: goals, key user flows, proposed layout (tabs/sections), field labels and helper text, feedback for success and errors, empty states, and brief accessibility notes. Keep it proportionate to a one-file Gradio prototype.
+    Here are the requirements: {requirements}
+    IMPORTANT: Output ONLY in markdown format (headings, bullets, and short tables where helpful). No code in this artifact.
+  expected_output: >
+    A markdown UX/UI report the frontend engineer can implement directly.
+  agent: ux_ui_engineer
+  context:
+    - design_task
+  output_file: output/ux_ui_spec.md
+
+code_task:
+  description: >
+    Write a python module that implements the design described by the engineering lead, in order to achieve the requirements.
+    Here are the requirements: {requirements}
+  expected_output: >
+    A python module that implements the design and achieves the requirements.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: backend_engineer
+  context:
+    - design_task
+    - ux_ui_task
+  output_file: output/{module_name}
+
+frontend_task:
+  description: >
+    Write a Gradio UI in app.py that demonstrates the backend class in {module_name}.
+    Follow the UX/UI specification from the UX/UI task (layout, flows, copy, states) and wire it to the real implementation produced in the code task.
+    Assume there is only one user; keep it a simple prototype, but do not ignore the UX report—resolve conflicts in favor of correct backend behavior
+    while preserving UX intent (clear messaging when an action is invalid, etc.).
+    Here are the requirements: {requirements}
+  expected_output: >
+    A Gradio app.py that reflects the UX/UI spec and imports the backend class from {module_name}.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: frontend_engineer
+  context:
+    - code_task
+    - ux_ui_task
+  output_file: output/app.py
+
+qa_planning_task:
+  description: >
+    As the QA owner, produce a test and quality plan for {module_name} (and how app.py exercises it): scope, risks, test objectives,
+    requirement-to-test traceability (matrix or table), prioritized test scenarios including negative and edge cases, data/setup notes,
+    and what you will automate in pytest vs. leave as manual/demo verification for this prototype.
+    Here are the requirements: {requirements}
+    IMPORTANT: Output ONLY in markdown format. No Python in this artifact.
+  expected_output: >
+    A markdown QA/test plan ready for the automation task to implement.
+  agent: test_engineer
+  context:
+    - design_task
+    - code_task
+    - ux_ui_task
+    - frontend_task
+  output_file: output/qa_test_plan.md
+
+test_task:
+  description: >
+    Implement the automated portion of the QA plan using pytest in test_{module_name} alongside the backend module.
+    Cover the critical behaviors called out in the plan (including validation and failure modes); keep tests deterministic and maintainable.
+    Here are the requirements: {requirements}
+  expected_output: >
+    A test_{module_name} module (pytest) that reflects the QA plan and exercises the backend appropriately.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: test_engineer
+  context:
+    - design_task
+    - code_task
+    - qa_planning_task
+  output_file: output/test_{module_name}

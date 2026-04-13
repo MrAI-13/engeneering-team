@@ -78,27 +78,6 @@ This loads `EngineeringTeam`, substitutes `requirements`, `module_name`, and `cl
 
 Optional tools can be added in `src/engineering_team/tools/` and attached in `crew.py` (the included `custom_tool.py` is a stub and is not wired by default).
 
-## Pushing to your own GitHub repo
-
-This folder may live inside a larger monorepo. To publish **your fork or your copy** under **your** GitHub account:
-
-1. Create a **new empty repository** on GitHub (no need to add a README if you already have this tree).
-2. From the **git root** that contains the commits you want (e.g. the parent `agents` repo, or a repo that only contains `engineering_team`), set the remote to your repo:
-
-   ```bash
-   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   ```
-
-   Or keep the course/upstream remote and add yours:
-
-   ```bash
-   git remote rename origin upstream
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   git push -u origin main
-   ```
-
-3. **Never commit `.env`**; it should stay gitignored. Rotate any key that was ever committed.
-
 ## CrewAI resources
 
 - [CrewAI documentation](https://docs.crewai.com)
